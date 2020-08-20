@@ -14,31 +14,78 @@ except() {
 	exit ${2:-1}
 }
 
+# Parse arguments
 case $1 in
-    --help)
-	echo "Usage: convert1080p.sh {input.mkv} {output.mkv}"
+	-h|--help)
+	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -s {main subtitle track number}"
+	exit
 	;;
 esac
 
-readonly inputfile="$1"
-readonly outputfile="$2"
+while [[ $# -gt 0 ]]
+do
+argv="$1"
 
+case $argv in
+	-i|--input)
+		readonly inputfile="$2"
+		shift # position arguments to next 
+		shift
+		;;
+	-o|--output)
+		readonly outputfile="$2"
+		shift # position arguments to next 
+		shift
+		;;
+	-a|--audio)
+		readonly audiotrack="$2"
+		shift # position arguments to next
+		shift
+		;;
+	-s|--subtitle)
+		readonly subtitletrack="$2"
+		shift # position arguments to next
+		shift
+		;;
+	-fs|--forcedsubtitle)
+		readonly forcedsubtitletrack="$2"
+		shift # position arguments to next
+		shift
+		;;
+	*)
+		except "Unknown input $1"
+		shift
+		;;
+esac
+done
+
+#Required arguments
 if [ ! "$inputfile" ]; then
 	except "Missing source file"
 fi
-
-
 if [ ! "$outputfile" ]; then
 	except "Missing required output"
+fi
+if [ ! "$audiotrack" ]; then
+	except "Missing audio track"
 fi
 
 video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
 encoder_options="ref=5:bframes=5" # Taken from superHQ profile
 # encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
-audio_options='-aencoder av_aac,ac3,copy:dtshd --mixdown "stereo,5point1" --aname "Stereo,AC3 Surround 5.1,Surround 5.1"'
+
+audio_options='--audio $audiotrack -aencoder av_aac,ac3,copy:dtshd --mixdown "stereo,5point1" --aname "Stereo,AC3 Surround 5.1,Surround 5.1"'
 picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
 filters_options="" #profile is all default
-subtitles_options="-s 1" #-s 1,2,3 --subtitle_burned 2
+subtitles_options=""
+if [ "$subtitletrack" ]; then
+	subtitles_options="-s $subtitletrack" #-s 1,2,3 --subtitle_burned 2
+fi
+if [ "$forcedsubtitletrack" ]; then
+	subtitles_options="$subtitles_options --subtitle_burned $forcedsubtitletrack"
+fi
+
+### Encode Video
 
 #echo "HandBrakeCLI $video_options --encopts $encoder_options $audio_options $subtitles_options --input $inputfile --output $outputfile 2>&1"
 time HandBrakeCLI $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
