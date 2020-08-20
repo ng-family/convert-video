@@ -21,7 +21,6 @@ case $1 in
 esac
 
 readonly inputfile="$1"
-echo $inputfile
 readonly outputfile="$2"
 
 if [ ! "$inputfile" ]; then
