@@ -74,7 +74,7 @@ video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High -
 encoder_options="ref=5:bframes=5" # Taken from superHQ profile
 # encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
 
-audio_options='--audio $audiotrack -aencoder av_aac,ac3,copy:dtshd --mixdown "stereo,5point1" --aname "Stereo,AC3 Surround 5.1,Surround 5.1"'
+audio_options="--audio $audiotrack -aencoder av_aac,ac3,copy:dtshd --mixdown \"stereo,5point1\" --aname \"Stereo,AC3 Surround 5.1,Surround 5.1\""
 picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
 filters_options="" #profile is all default
 subtitles_options=""
