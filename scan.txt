@@ -1,0 +1,198 @@
+[06:57:55] hb_init: starting libhb thread
+[06:57:55] thread 7fab363ed700 started ("libhb")
+HandBrake 1.3.1 (2020032300) - Linux x86_64 - https://handbrake.fr
+12 CPUs detected
+Opening /mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv...
+[06:57:55] CPU: AMD Ryzen 5 3600 6-Core Processor              
+[06:57:55]  - logical processor count: 12
+[06:57:55] hb_scan: path=/mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv, title_index=1
+udfread ERROR: ECMA 167 Volume Recognition failed
+disc.c:323: failed opening UDF image /mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv
+disc.c:424: error opening file BDMV/index.bdmv
+disc.c:424: error opening file BDMV/BACKUP/index.bdmv
+bluray.c:2585: nav_get_title_list(/mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv/) failed
+[06:57:55] bd: not a bd - trying as a stream/file instead
+libdvdnav: Using dvdnav version 6.0.1
+libdvdread: Encrypted DVD support unavailable.
+************************************************
+**                                            **
+**  No css library available. See             **
+**  /usr/share/doc/libdvdread4/README.css     **
+**  for more information.                     **
+**                                            **
+************************************************
+libdvdread:DVDOpenFileUDF:UDFFindFile /VIDEO_TS/VIDEO_TS.IFO failed
+libdvdread:DVDOpenFileUDF:UDFFindFile /VIDEO_TS/VIDEO_TS.BUP failed
+libdvdread: Can't open file VIDEO_TS.IFO.
+libdvdnav: vm: failed to read VIDEO_TS.IFO
+[06:57:55] dvd: not a dvd - trying as a stream/file instead
+Input #0, matroska,webm, from '/mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv':
+  Metadata:
+    title           : Dumbo
+    encoder         : libmakemkv v1.14.5 (1.3.5/1.4.7) win(x64-release)
+    creation_time   : 2019-11-11T23:11:35.000000Z
+  Duration: 01:51:56.51, start: 0.000000, bitrate: 64108 kb/s
+    Chapter #0:0: start 0.000000, end 169.460958
+    Metadata:
+      title           : Chapter 01
+    Chapter #0:1: start 169.460958, end 406.072333
+    Metadata:
+      title           : Chapter 02
+    Chapter #0:2: start 406.072333, end 683.766417
+    Metadata:
+      title           : Chapter 03
+    Chapter #0:3: start 683.766417, end 993.909583
+    Metadata:
+      title           : Chapter 04
+    Chapter #0:4: start 993.909583, end 1160.492667
+    Metadata:
+      title           : Chapter 05
+    Chapter #0:5: start 1160.492667, end 1568.233333
+    Metadata:
+      title           : Chapter 06
+    Chapter #0:6: start 1568.233333, end 1665.997667
+    Metadata:
+      title           : Chapter 07
+    Chapter #0:7: start 1665.997667, end 1867.699167
+    Metadata:
+      title           : Chapter 08
+    Chapter #0:8: start 1867.699167, end 2109.023583
+    Metadata:
+      title           : Chapter 09
+    Chapter #0:9: start 2109.023583, end 2444.775667
+    Metadata:
+      title           : Chapter 10
+    Chapter #0:10: start 2444.775667, end 2804.927125
+    Metadata:
+      title           : Chapter 11
+    Chapter #0:11: start 2804.927125, end 3023.895875
+    Metadata:
+      title           : Chapter 12
+    Chapter #0:12: start 3023.895875, end 3435.014917
+    Metadata:
+      title           : Chapter 13
+    Chapter #0:13: start 3435.014917, end 3713.000958
+    Metadata:
+      title           : Chapter 14
+    Chapter #0:14: start 3713.000958, end 4038.784750
+    Metadata:
+      title           : Chapter 15
+    Chapter #0:15: start 4038.784750, end 4211.665792
+    Metadata:
+      title           : Chapter 16
+    Chapter #0:16: start 4211.665792, end 4487.858375
+    Metadata:
+      title           : Chapter 17
+    Chapter #0:17: start 4487.858375, end 4684.721708
+    Metadata:
+      title           : Chapter 18
+    Chapter #0:18: start 4684.721708, end 5275.895625
+    Metadata:
+      title           : Chapter 19
+    Chapter #0:19: start 5275.895625, end 5829.532042
+    Metadata:
+      title           : Chapter 20
+    Chapter #0:20: start 5829.532042, end 5980.975000
+    Metadata:
+      title           : Chapter 21
+    Chapter #0:21: start 5980.975000, end 6242.444542
+    Metadata:
+      title           : Chapter 22
+    Chapter #0:22: start 6242.444542, end 6716.512000
+    Metadata:
+      title           : Chapter 23
+    Stream #0:0(eng): Video: hevc (Main 10), yuv420p10le(tv, bt2020nc/bt2020/smpte2084), 3840x2160 [SAR 1:1 DAR 16:9], 23.98 fps, 23.98 tbr, 1k tbn, 23.98 tbc
+    Metadata:
+      BPS-eng         : 58184838
+      DURATION-eng    : 01:51:56.501458333
+      NUMBER_OF_FRAMES-eng: 161035
+      NUMBER_OF_BYTES-eng: 48849816160
+      SOURCE_ID-eng   : 001011
+      _STATISTICS_WRITING_APP-eng: MakeMKV v1.14.5 win(x64-release)
+      _STATISTICS_WRITING_DATE_UTC-eng: 2019-11-11 23:11:35
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+    Stream #0:1(eng): Audio: truehd, 48000 Hz, 7.1, s32 (24 bit) (default)
+    Metadata:
+      title           : Surround 7.1
+      BPS-eng         : 4916199
+      DURATION-eng    : 01:51:56.502500000
+      NUMBER_OF_FRAMES-eng: 8059803
+      NUMBER_OF_BYTES-eng: 4127457646
+      SOURCE_ID-eng   : 001100
+      _STATISTICS_WRITING_APP-eng: MakeMKV v1.14.5 win(x64-release)
+      _STATISTICS_WRITING_DATE_UTC-eng: 2019-11-11 23:11:35
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+    Stream #0:2(eng): Audio: ac3, 48000 Hz, 5.1(side), fltp, 640 kb/s
+    Metadata:
+      title           : Surround 5.1
+      BPS-eng         : 640000
+      DURATION-eng    : 01:51:56.512000000
+      NUMBER_OF_FRAMES-eng: 209891
+      NUMBER_OF_BYTES-eng: 537320960
+      SOURCE_ID-eng   : 001100
+      _STATISTICS_WRITING_APP-eng: MakeMKV v1.14.5 win(x64-release)
+      _STATISTICS_WRITING_DATE_UTC-eng: 2019-11-11 23:11:35
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+    Stream #0:3(eng): Audio: ac3, 48000 Hz, stereo, fltp, 320 kb/s
+    Metadata:
+      title           : Stereo
+      BPS-eng         : 320000
+      DURATION-eng    : 01:51:56.512000000
+      NUMBER_OF_FRAMES-eng: 209891
+      NUMBER_OF_BYTES-eng: 268660480
+      SOURCE_ID-eng   : 001101
+      _STATISTICS_WRITING_APP-eng: MakeMKV v1.14.5 win(x64-release)
+      _STATISTICS_WRITING_DATE_UTC-eng: 2019-11-11 23:11:35
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+    Stream #0:4(eng): Subtitle: hdmv_pgs_subtitle
+    Metadata:
+      BPS-eng         : 35478
+      DURATION-eng    : 01:43:30.099729166
+      NUMBER_OF_FRAMES-eng: 3130
+      NUMBER_OF_BYTES-eng: 27540277
+      SOURCE_ID-eng   : 0012A0
+      _STATISTICS_WRITING_APP-eng: MakeMKV v1.14.5 win(x64-release)
+      _STATISTICS_WRITING_DATE_UTC-eng: 2019-11-11 23:11:35
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES SOURCE_ID
+[06:57:55] scan: decoding previews for title 1
+Scanning title 1 of 1, preview 1, 10.00 %[06:57:55] scan: audio 0x1: truehd, rate=48000Hz, bitrate=1 English (TrueHD) (7.1 ch)
+[06:57:55] scan: audio 0x2: ac3, rate=48000Hz, bitrate=640000 English (AC3) (5.1 ch) (640 kbps)
+[06:57:55] scan: audio 0x3: ac3, rate=48000Hz, bitrate=320000 English (AC3) (2.0 ch) (320 kbps)
+Scanning title 1 of 1, preview 1, 10.00 %Scanning title 1 of 1, preview 2, 20.00 %Scanning title 1 of 1, preview 3, 30.00 %Scanning title 1 of 1, preview 4, 40.00 %Scanning title 1 of 1, preview 4, 40.00 %Scanning title 1 of 1, preview 5, 50.00 %Scanning title 1 of 1, preview 6, 60.00 %Scanning title 1 of 1, preview 6, 60.00 %Scanning title 1 of 1, preview 7, 70.00 %Scanning title 1 of 1, preview 8, 80.00 %Scanning title 1 of 1, preview 9, 90.00 %Scanning title 1 of 1, preview 10, 100.00 %Scanning title 1 of 1, preview 10, 100.00 %[06:57:59] scan: 10 previews, 3840x2160, 23.976 fps, autocrop = 42/42/0/0, aspect 16:9, PAR 1:1
+[06:57:59] libhb: scan thread found 1 valid title(s)
++ title 1:
+  + stream: /mnt/plexmedia/Raw/Dumbo (2019) 4K.mkv
+  + duration: 01:51:56
+  + size: 3840x2160, pixel aspect: 1/1, display aspect: 1.78, 23.976 fps
+  + autocrop: 42/42/0/0
+  + chapters:
+    + 1: duration 00:02:49
+    + 2: duration 00:03:57
+    + 3: duration 00:04:38
+    + 4: duration 00:05:10
+    + 5: duration 00:02:47
+    + 6: duration 00:06:48
+    + 7: duration 00:01:38
+    + 8: duration 00:03:22
+    + 9: duration 00:04:01
+    + 10: duration 00:05:36
+    + 11: duration 00:06:00
+    + 12: duration 00:03:39
+    + 13: duration 00:06:51
+    + 14: duration 00:04:38
+    + 15: duration 00:05:26
+    + 16: duration 00:02:53
+    + 17: duration 00:04:36
+    + 18: duration 00:03:17
+    + 19: duration 00:09:51
+    + 20: duration 00:09:14
+    + 21: duration 00:02:31
+    + 22: duration 00:04:21
+    + 23: duration 00:07:54
+  + audio tracks:
+    + 1, English (TrueHD) (7.1 ch) (iso639-2: eng)
+    + 2, English (AC3) (5.1 ch) (640 kbps) (iso639-2: eng), 48000Hz, 640000bps
+    + 3, English (AC3) (2.0 ch) (320 kbps) (iso639-2: eng), 48000Hz, 320000bps
+  + subtitle tracks:
+    + 1, English [PGS]
+HandBrake has exited.

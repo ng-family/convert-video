@@ -67,11 +67,30 @@ if [ ! "$audiotrack" ]; then
 	except "Missing audio track"
 fi
 
+## Determine Video Size and apply appropriate video option
+scanresults=$(HandBrakeCLI --input "$inputfile" --scan 2>&1)
+videostream=$(grep -P '(?<=Stream).*[0-9]+x[0-9]+' <<< "$scanresults")
+videoheight=$(grep -oP '(?<=[0-9]{3}x)[0-9]+' <<< "$videostream")
+if (($videoheight < 484)); then
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
+	encoder_options="ref=5:bframes=5" # Taken from superHQ profile
+	audio_options="-a "$audiotrack" -E av_aac,ac3,copy -6 stereo,5point1 -A \"Stereo,AC3\ Surround\ 5.1,Surround\ 5.1\""
+elif (($videoheight < 1090)); then
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
+	encoder_options="ref=5:bframes=5" # Taken from superHQ profile
+	audio_options="-a "$audiotrack" -E av_aac,ac3,copy -6 stereo,5point1 -A \"Stereo,AC3\ Surround\ 5.1,Surround\ 5.1\""
+else
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
+	encoder_options="ref=5:bframes=5" # Taken from superHQ profile
+	audio_options="-a "$audiotrack" -E av_aac,ac3,copy -6 stereo,5point1 -A \"Stereo,AC3\ Surround\ 5.1,Surround\ 5.1\""
+fi
+exit
+
 ## Handbrake Options for 1080
-video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
-encoder_options="ref=5:bframes=5" # Taken from superHQ profile
+#video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
+#encoder_options="ref=5:bframes=5" # Taken from superHQ profile
 # encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
-audio_options="-a "$audiotrack" -E av_aac,ac3,copy:dtshd -6 stereo,5point1 -A \"Stereo,AC3\ Surround\ 5.1,Surround\ 5.1\""
+#audio_options="-a "$audiotrack" -E av_aac,ac3,copy -6 stereo,5point1 -A \"Stereo,AC3\ Surround\ 5.1,Surround\ 5.1\""
 picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
 filters_options="" #profile is all default
 subtitles_options=""
