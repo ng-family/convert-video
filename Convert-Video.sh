@@ -63,6 +63,9 @@ fi
 if [ ! "$outputfile" ]; then
 	except "Missing required output"
 fi
+if [ "$inputfile" = "$outputfile" ]; then
+	except "Destination same as source file"
+fi
 if [ ! "$audiotrack" ]; then
 	except "Missing audio track"
 fi
@@ -82,7 +85,7 @@ do
 done <<< "$videostream"
 if (($videoheight < 484)); then
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 -q 16 -2 --pfr"
-	audio_options="-a $audiotrack -aencode av_aac,copy -6 stereo -A Stereo,\"Surround\ 5.1\""
+	audio_options="-a $audiotrack -aencode av_aac,copy -6 stereo -A Stereo,\"Surround 5.1\""
 elif (($videoheight < 1090)); then
 	video_options='--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr'
 	audio_options="-a $audiotrack -aencode av_aac,ac3,copy -6 stereo,5point1 -A Stereo,\"AC3\ Surround\ 5.1,Surround\ 5.1\""
