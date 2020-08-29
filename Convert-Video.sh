@@ -14,7 +14,7 @@ except() {
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -s {main subtitle track number}"
+	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -s {main subtitle track number} -fs {subtitle track to be burned in"
 	exit
 	;;
 esac
