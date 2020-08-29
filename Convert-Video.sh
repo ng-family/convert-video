@@ -14,7 +14,7 @@ except() {
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -s {main subtitle track number} -fs {subtitle track to be burned in"
+	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -s {main subtitle track number} -fs {subtitle track to be burned in}"
 	exit
 	;;
 esac
@@ -85,14 +85,14 @@ do
 done <<< "$videostream"
 if (($videoheight < 484)); then
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 -q 16 -2 --pfr"
-	audio_options="-a $audiotrack -aencode av_aac,copy -6 stereo -A Stereo,\"Surround 5.1\""
+	audio_options="-a $audiotrack --aencode av_aac,copy -6 stereo -A Stereo,Surround 5.1"
 elif (($videoheight < 1090)); then
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
-	audio_options="-a $audiotrack -aencode av_aac,ac3,copy -6 stereo,5point1 -A Stereo,\"AC3\ Surround\ 5.1,Surround\ 5.1\""
+	audio_options="-a $audiotrack --aencode av_aac,ac3,copy -6 stereo,5point1 -A Stereo,\"AC3\ Surround\ 5.1,Surround\ 5.1\""
 else
 	#I'm debating of implementing AV1 here since 4k movies are soooo large
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
-	audio_options="-a "$audiotrack" -E av_aac,ac3,copy -6 stereo,5point1 -A \"Stereo,AC3 Surround 5.1,Surround 5.1\""
+	audio_options=""
 fi
 
 ## Manual Handbrake Options Override
