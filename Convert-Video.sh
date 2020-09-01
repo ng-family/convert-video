@@ -84,7 +84,9 @@ do
 	fi
 done <<< "$videostream"
 if (($videoheight < 484)); then
-	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 -q 16 -2 --pfr"
+	bitrate="4000"
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 --vb $bitrate -2 --pfr"
+	#video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 -q 16 -2 --pfr"
 	audio_options="-a $audiotrack --aencode av_aac,copy -6 stereo -A Stereo,Surround 5.1"
 elif (($videoheight < 1090)); then
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
@@ -95,11 +97,7 @@ else
 	audio_options=""
 fi
 
-## Manual Handbrake Options Override
-# video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
 encoder_options="ref=5:bframes=5" # Taken from superHQ profile
-# encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
-# audio_options="-a $audiotrack --aencode ca_aac,copy -6 stereo -A Stereo,\"Surround 5.1\""
 picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
 filters_options="" #profile is all default
 subtitles_options=""
@@ -108,6 +106,14 @@ if [ "$subtitletrack" ]; then
 fi
 if [ "$forcedsubtitletrack" ]; then
 	subtitles_options="$subtitles_options --subtitle_burned $forcedsubtitletrack" #expecting a string like "2"
+fi
+
+## Manual Handbrake Options Override
+if false; then
+	bitrate="4000"
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile High --encoder-level 3.1 --vb $bitrate -2 --pfr"
+	# encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
+	# audio_options="-a $audiotrack --aencode ca_aac,copy -6 stereo -A Stereo,\"Surround 5.1\""
 fi
 
 ## Encode Video
