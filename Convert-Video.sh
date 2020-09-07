@@ -87,20 +87,17 @@ done <<< "$videostream"
 if (($videoheight < 484)); then
 	autoselection+="D"
 	bitrate="4000"
-	video_options="--encoder x264 --encoder-preset veryslow --encoder-profile high --encoder-level 3.1 --vb $bitrate -2 --pfr"
-	#video_options="--encoder x264 --encoder-preset veryslow --encoder-profile High --encoder-level 3.1 -q 16 -2 --pfr"
-
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 3.1 --vb $bitrate -2 --pfr"
 elif (($videoheight < 1090)); then
 	autoselection+="B"
 	video_options=" --encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
-
 else
 	autoselection+="4"
 	#I'm debating of implementing AV1 here since 4k movies are soooo large
-	video_options="--encoder x264 --encoder-preset veryslow --encoder-profile High --encoder-level 4.0 -q 20 -2 --pfr"
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
 fi
 
-encoder_options="ref=5:bframes=5 " # Taken from superHQ profile
+encoder_options="ref=5:bframes=5:level=4.0:b-adapt=2:direct=auto:analyse=all:me=umh:merange=24:subme=10:trellis=2:vbv-bufsize=31250:vbv-maxrate=25000:rc-lookahead=60 " # Taken from superHQ profile
 picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
 filters_options="" #profile is all default
 subtitles_options=""
@@ -113,19 +110,18 @@ audiochannel="${audiochannels[$audiotrack-1]}"
 IFS=$OIFS
 if [[ $audiochannel == *"7.1"* ]]; then
 	autoselection+="7"
-	audio_options="-a $audiotrack,$audiotrack,$audiotrack --aencode av_aac,ac3,copy -6 stereo,5point1 -A Stereo,\"Surround 5.1\",\"Surround 7.1\" "
-
+	audio_options="--audio $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
 elif [[ $audiochannel == *"5.1"* ]]; then
 	autoselection+="5"
-	audio_options="-a $audiotrack,$audiotrack -E ca_aac,copy -6 stereo -A Stereo,\"Surround 5.1\" "
+	audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
 else
 	autoselection+="2"
-	audio_options="-a $audiotrack --aencode copy -A Stereo "
+	audio_options="--audio $audiotrack --aencode copy --aname Stereo"
 fi
 
 if [ "$subtitletrack" ]; then
 	autoselection+="S"
-	subtitles_options="-s $subtitletrack" #expecting a string like "1,1,2"
+	subtitles_options="--subtitle $subtitletrack" #expecting a string like "1"
 fi
 if [ "$forcedsubtitletrack" ]; then
 	autoselection+="F"
@@ -138,11 +134,10 @@ if false; then
 	bitrate="4000"
 	video_options="--encoder x264 --x264-preset veryslow --x264-profile high -q 20 -2 --pfr"
 	# encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
-	audio_options="-a $audiotrack,$audiotrack --aencoder av_aac,copy -6 stereo -A Stereo,\"Surround 5.1\" "
+	audio_options="--audio $audiotrack,$audiotrack --aencoder av_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
 fi
 
 ## Encode Video
 time "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
 echo "$autoselection"
-echo "$handbrakeopt"
 
