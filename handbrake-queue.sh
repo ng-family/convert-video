@@ -14,7 +14,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: handbrake-queue.sh -d {directory} -j {jobs.csv}"
+	echo "Usage: handbrake-queue.sh -s {script} -d {directory} -j {jobs.csv}"
 	exit
 	;;
 esac
@@ -34,6 +34,11 @@ case $argv in
 		shift # position arguments to next 
 		shift
 		;;
+	-s|--script)
+		scriptfile="$2"
+		shift
+		shift
+		;;
 	*)
 		except "Unknown input $1"
 		shift
@@ -42,8 +47,11 @@ esac
 done
 
 ## Required arguments
+if [ ! "$scriptfile" ]; then
+	except "Missing script location"
+fi
 if [ ! "$jobfile" ]; then
-	except "Cannot find job file"
+	except "Missing job file"
 fi
 
 ## Check if handbrake is running
@@ -53,19 +61,38 @@ for activeprocess in $psoutput; do
 		except "HandBrakeCLI is running"
 	fi
 done
-## read in job file
+
+## Convert videos
 if [ $directory ]; then
 	jobfile="$directory/$jobfile"
+	logfile="$directory/handbrake-queue.log"
+else
+	logfile="handbrake-queue.log"
 fi
+echo "`date -u`" >> $logfile
 while IFS=, read -r sourcefile outputfile audio subtitle forcedsubtitle
 do
-	echo "Source file : $sourcefile"
-	echo "Output file : $outputfile"
-	echo "Audio track : $audio"
-	echo "Subtitle track : $subtitle"
-	echo "Forced Subtitle track : $forcedsubtitle"
-	echo "Source file : $sourcefile"
+	command="$scriptfile"
+	if [ ! "$sourcefile" ]; then
+		except "Line in jobs file does not have source argument"
+	fi
+	command="$command -i $directory/$sourcefile"
+	if [ ! "$outputfile" ]; then
+		except "Line in jobs file does not have output argument"
+	fi
+	command="$command -o $directory/$outputfile"
+	if [ ! "$audio" ]; then
+		except "Line in jobs file does not have audio argument"
+	fi
+	command="$command -a $audio"
+	if [ "$subtitle" ]; then
+		command="$command -s $subtitle"
+	fi
+	if [ "$forcedsubtitle" ]; then
+		command="$command -fs $forcedsubtitle"
+	fi
+	echo "$command" >> $logfile
+	$command # Do it!
 done < $jobfile
-## launch convert-video.sh
-echo "Do things"
-
+## Clean up jobs csv and save log
+echo "rm $directory/$jobfile"
