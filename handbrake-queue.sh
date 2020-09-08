@@ -14,7 +14,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: handbrake-queue.sh -j {jobs.txt}"
+	echo "Usage: handbrake-queue.sh -d {directory} -j {jobs.csv}"
 	exit
 	;;
 esac
@@ -24,8 +24,13 @@ do
 argv="$1"
 
 case $argv in
+	-d|--directory)
+		directory="$2"
+		shift
+		shift
+		;;
 	-j|--jobs)
-		readonly jobfile="$2"
+		jobfile="$2"
 		shift # position arguments to next 
 		shift
 		;;
@@ -41,10 +46,26 @@ if [ ! "$jobfile" ]; then
 	except "Cannot find job file"
 fi
 
-## check if handbrake is running
-
+## Check if handbrake is running
+psoutput=$(ps aux | grep -i "HandBrakeCLI -i" | awk '{print $11}')
+for activeprocess in $psoutput; do
+	if [ $activeprocess == "HandBrakeCLI" ] ;then
+		except "HandBrakeCLI is running"
+	fi
+done
 ## read in job file
-
+if [ $directory ]; then
+	jobfile="$directory/$jobfile"
+fi
+while IFS=, read -r sourcefile outputfile audio subtitle forcedsubtitle
+do
+	echo "Source file : $sourcefile"
+	echo "Output file : $outputfile"
+	echo "Audio track : $audio"
+	echo "Subtitle track : $subtitle"
+	echo "Forced Subtitle track : $forcedsubtitle"
+	echo "Source file : $sourcefile"
+done < $jobfile
 ## launch convert-video.sh
-
+echo "Do things"
 
