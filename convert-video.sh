@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#convert1080p.sh
+#convert-video.sh
 #
 # This script takes a mkv container file and output a mkv compressed to a specific quality.
 # 
@@ -14,7 +14,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert1080p.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-s {main subtitle track number}] [-fs {subtitle track to be burned in}]"
+	echo "Usage: convert-video.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-s {main subtitle track number}] [-fs {subtitle track to be burned in}]"
 	exit
 	;;
 esac
@@ -90,7 +90,7 @@ if (($videoheight < 484)); then
 	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 3.1 --vb $bitrate -2 --pfr"
 elif (($videoheight < 1090)); then
 	autoselection+="B"
-	video_options=" --encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
+	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
 else
 	autoselection+="4"
 	#I'm debating of implementing AV1 here since 4k movies are soooo large
