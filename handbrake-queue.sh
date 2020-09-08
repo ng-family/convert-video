@@ -14,7 +14,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert1080p.sh -j {jobs.txt}"
+	echo "Usage: handbrake-queue.sh -j {jobs.txt}"
 	exit
 	;;
 esac
