@@ -8,9 +8,11 @@
 ## Error handler
 except() {
 	echo "Error: $1" >&2
+	echo "Error: $1" >> $logfile
 	exit ${2:-1}
 }
 OIFS=$IFS
+logfile="/home/paul/Convert-Video/handbrake-queue.log"
 ## Parse arguments
 case $1 in
 	-h|--help)
@@ -66,33 +68,37 @@ done
 if [ $directory ]; then
 	jobfile="$directory/$jobfile"
 	logfile="$directory/handbrake-queue.log"
+	sourcefile="$directory/$sourcefile"
+	outputfile="$directory/$outputfile"
 else
 	logfile="handbrake-queue.log"
 fi
+logfile="/home/paul/Convert-Video/handbrake-queue.log"
 echo "`date -u`" >> $logfile
-while IFS=, read -r sourcefile outputfile audio subtitle forcedsubtitle
-do
-	command="$scriptfile"
-	if [ ! "$sourcefile" ]; then
-		except "Line in jobs file does not have source argument"
-	fi
-	command="$command -i $directory/$sourcefile"
-	if [ ! "$outputfile" ]; then
-		except "Line in jobs file does not have output argument"
-	fi
-	command="$command -o $directory/$outputfile"
-	if [ ! "$audio" ]; then
-		except "Line in jobs file does not have audio argument"
-	fi
-	command="$command -a $audio"
-	if [ "$subtitle" ]; then
-		command="$command -s $subtitle"
-	fi
-	if [ "$forcedsubtitle" ]; then
-		command="$command -fs $forcedsubtitle"
-	fi
-	echo "$command" >> $logfile
-	$command # Do it!
-done < $jobfile
+if [[ -f "$jobfile" ]]; then
+	while IFS=, read -r sourcefile outputfile audio subtitle forcedsubtitle
+	do
+		if [ ! "$sourcefile" ]; then
+			except "Line in jobs file does not have source argument"
+		fi
+		if [ ! "$outputfile" ]; then
+			except "Line in jobs file does not have output argument"
+		fi
+		if [ ! "$audio" ]; then
+			except "Line in jobs file does not have audio argument"
+		fi
+		convertoptions=('-i' "$sourcefile" '-o' "$outputfile" '-a' $audio)
+		if [ "$subtitle" ]; then
+			convertoptions+=('-s' $subtitle)
+		fi
+		if [ "$forcedsubtitle" ]; then
+			convertoptions+=('-fs' $forcedsubtitle)
+		fi
+		for i in "${convertoptions[@]}"; do echo "$i"; done
+		#$scriptfile "${command[@]}" # Do it!
+	done < $jobfile
+else
+	except "No job file!"
+fi
 ## Clean up jobs csv and save log
-echo "rm $directory/$jobfile"
+mv -f "$jobfile" "$jobfile.old"

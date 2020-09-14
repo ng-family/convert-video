@@ -10,6 +10,16 @@ except() {
 	echo "Error: $1" >&2
 	exit ${2:-1}
 }
+
+## Manual Delay until I get handbrake-queue running.
+if false; then
+	c_time=$(date +%s)
+	x_time=$(date -d '09/14/2020 2:00' +%s)
+	d_time=$(( $x_time - $c_time ))
+	echo "Going to sleep for $d_time seconds"
+	sleep $d_time
+fi
+
 OIFS=$IFS
 ## Parse arguments
 case $1 in
