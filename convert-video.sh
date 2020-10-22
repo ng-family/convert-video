@@ -14,7 +14,7 @@ except() {
 ## Manual Delay until I get handbrake-queue running.
 if false; then
 	c_time=$(date +%s)
-	x_time=$(date -d '09/14/2020 2:00' +%s)
+	x_time=$(date -d '09/19/2020 2:00' +%s)
 	d_time=$(( $x_time - $c_time ))
 	echo "Going to sleep for $d_time seconds"
 	sleep $d_time
@@ -129,15 +129,18 @@ else
 	audio_options="--audio $audiotrack --aencode copy --aname Stereo"
 fi
 
-if [ "$subtitletrack" ]; then
+## Add Subtitles
+if [ "$forcedsubtitletrack" ]; then
+	if [ "$subtitletrack" ]; then
+		autoselection+="SF"
+		subtitles_options="--subtitle $forcedsubtitletrack,$subtitletrack --subtitle-burned=1"
+	else
+		autoselection+="F"
+		subtitles_options="--subtitle $forcedsubtitletrack --subtitle-burned=1" #expecting a string like "2"
+elif [ "$subtitletrack" ]; then
 	autoselection+="S"
 	subtitles_options="--subtitle $subtitletrack" #expecting a string like "1"
 fi
-if [ "$forcedsubtitletrack" ]; then
-	autoselection+="F"
-	subtitles_options="$subtitles_options --subtitle_burned $forcedsubtitletrack" #expecting a string like "2"
-fi
-
 ## Manual Handbrake Options Override
 if false; then
 	autoselection="O"
