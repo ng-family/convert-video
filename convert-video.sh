@@ -133,10 +133,10 @@ fi
 if [ "$forcedsubtitletrack" ]; then
 	if [ "$subtitletrack" ]; then
 		autoselection+="SF"
-		subtitles_options="--subtitle $forcedsubtitletrack,$subtitletrack --subtitle-burned=1"
+		subtitles_options="--subtitle $forcedsubtitletrack,$subtitletrack --subtitle-burned" #--subtitle-burned=1 is silent default
 	else
 		autoselection+="F"
-		subtitles_options="--subtitle $forcedsubtitletrack --subtitle-burned=1" #expecting a string like "2"
+		subtitles_options="--subtitle $forcedsubtitletrack --subtitle-burned"
 elif [ "$subtitletrack" ]; then
 	autoselection+="S"
 	subtitles_options="--subtitle $subtitletrack" #expecting a string like "1"
