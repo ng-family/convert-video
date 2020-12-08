@@ -24,7 +24,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert-video.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-s {main subtitle track number}] [-fs {subtitle track to be burned in}]"
+	echo "Usage: convert-video.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-s {main subtitle track number}] [-fs {subtitle track to be burned in}] | [-b75s {7 ch audio track}{5 ch audio track}{subtitle track}]"
 	exit
 	;;
 esac
@@ -57,6 +57,15 @@ case $argv in
 	-fs|--forcedsubtitle)
 		readonly forcedsubtitletrack="$2"
 		shift # position arguments to next
+		shift
+		;;
+	-b75s)
+		b75s="$2"
+		audiotrack=$b75s
+		ch7track=${b75s:0:1}
+		ch5track=${b75s:1:1}
+		subtitletrack=${b75s:2:1}
+		shift
 		shift
 		;;
 	*)
@@ -113,22 +122,26 @@ filters_options="" #profile is all default
 subtitles_options=""
 
 ## Determine Audio Channel and apply appropriate audio options
-audiostream=$(grep -P '(?<=Audio).*[0-9]\.[0-9]' <<< "$scanresults")
-IFS=$'\n'
-audiochannels=(${audiostream//\\n/ })
-audiochannel="${audiochannels[$audiotrack-1]}"
-IFS=$OIFS
-if [[ $audiochannel == *"7.1"* ]]; then
-	autoselection+="7"
-	audio_options="--audio $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
-elif [[ $audiochannel == *"5.1"* ]]; then
-	autoselection+="5"
-	audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
+if [ "$b75s" ]; then
+	audio_options="--audio $ch5track,$ch5track,$ch7track --aencoder av_aac,copy,copy --mixdown stereo --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
+	
 else
-	autoselection+="2"
-	audio_options="--audio $audiotrack --aencode copy --aname Stereo"
+	audiostream=$(grep -P '(?<=Audio).*[0-9]\.[0-9]' <<< "$scanresults")
+	IFS=$'\n'
+	audiochannels=(${audiostream//\\n/ })
+	audiochannel="${audiochannels[$audiotrack-1]}"
+	IFS=$OIFS
+	if [[ $audiochannel == *"7.1"* ]]; then
+		autoselection+="7"
+		audio_options="--audio $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
+	elif [[ $audiochannel == *"5.1"* ]]; then
+		autoselection+="5"
+		audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
+	else
+		autoselection+="2"
+		audio_options="--audio $audiotrack --aencode copy --aname Stereo"
+	fi
 fi
-
 ## Add Subtitles
 if [ "$forcedsubtitletrack" ]; then
 	if [ "$subtitletrack" ]; then
@@ -137,9 +150,13 @@ if [ "$forcedsubtitletrack" ]; then
 	else
 		autoselection+="F"
 		subtitles_options="--subtitle $forcedsubtitletrack --subtitle-burned"
+	fi
 elif [ "$subtitletrack" ]; then
 	autoselection+="S"
 	subtitles_options="--subtitle $subtitletrack" #expecting a string like "1"
+fi
+if [ "b75s" ]; then
+	autoselection=$b75s
 fi
 ## Manual Handbrake Options Override
 if false; then
@@ -152,5 +169,6 @@ fi
 
 ## Encode Video
 time "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
+echo "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile"
 echo "$autoselection"
 
