@@ -24,7 +24,7 @@ OIFS=$IFS
 ## Parse arguments
 case $1 in
 	-h|--help)
-	echo "Usage: convert-audioonly.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-a7 {7 channel audio}] [-a5 {5 channel audio}] | [-a2 {2 channel audio}]"
+	echo "Usage: convert-audioonly.sh -i {input.mkv} -o {output.mkv} -a {main audio track number} [-a7 {7 channel audio}] [-a5 {5 channel audio}] | [-a2 {2 channel audio}] [-s]"
 	exit
 	;;
 esac
@@ -64,6 +64,10 @@ case $argv in
 		shift # position arguments to next
 		shift
 		;;
+	-s|--subtitle)
+		readonly subtitle="1"
+		shift # position arguments to next
+		;;
 	*)
 		except "Unknown input $1"
 		shift
@@ -72,7 +76,6 @@ esac
 done
 
 
-## lbhalbhalbha
 
 
 ## Required arguments
@@ -85,90 +88,39 @@ fi
 if [ "$inputfile" = "$outputfile" ]; then
 	except "Destination same as source file"
 fi
-if [ ! "$audiotrack" ]; then
+if [ ! "$audiotrack" ] && [ ! "$audio7chtrack" ] && [ ! "$audio5chtrack" ] && [ ! "$audio2chtrack" ]; then
 	except "Missing audio track"
 fi
 
-autoselection=""
-## Determine Video Size and apply appropriate video option
-scanresults=$(HandBrakeCLI --input "$inputfile" --scan 2>&1)
-videostream=$(grep -P '(?<=Stream).*[0-9]+x[0-9]+' <<< "$scanresults")
-videoheight=0
-while IFS= read -r line
-do
-	height=$(grep -oP -m 1 '(?<=[0-9]{3}x)[0-9]+' <<< "$line")
-	if [ -z "$height" ]; then
-		echo "$height is empty"
-	elif (($height > $videoheight)); then
-		videoheight=$height
-	fi
-done <<< "$videostream"
-if (($videoheight < 484)); then
-	autoselection+="D"
-	bitrate="4000"
-	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 3.1 --vb $bitrate -2 --pfr"
-elif (($videoheight < 1090)); then
-	autoselection+="B"
-	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
-else
-	autoselection+="4"
-	#I'm debating of implementing AV1 here since 4k movies are soooo large
-	video_options="--encoder x264 --encoder-preset VerySlow --encoder-profile high --encoder-level 4.0 -q 20 -2 --pfr"
-fi
-
-encoder_options="ref=5:bframes=5:level=4.0:b-adapt=2:direct=auto:analyse=all:me=umh:merange=24:subme=10:trellis=2:vbv-bufsize=31250:vbv-maxrate=25000:rc-lookahead=60 " # Taken from superHQ profile
-picture_options="--auto-anamorphic" #--crop auto is default --modulus 2 is default
-filters_options="" #profile is all default
-subtitles_options=""
-
 ## Determine Audio Channel and apply appropriate audio options
-if [ "$b75s" ]; then
-	audio_options="--audio $ch5track,$ch5track,$ch7track --aencoder av_aac,copy,copy --mixdown stereo --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
-	
-else
+a7_options=""
+a5_options=""
+a2_options=""
+scanresults=$(HandBrakeCLI --input "$inputfile" --scan 2>&1)
+#ffmpeg -i /mnt/plexmedia/Movies/Family/The\ Grinch\ \(2018\).mkv -i ac3.mkv \-map 0:0 -map 0:1 -map 1:a -map 0:2 -map 0:3 -c:v copy -c:a:0 copy -c:a copy -c:a:1 copy -c:s copy /mnt/plexmedia/handbrake/The\ Grinch\ \(2018.mkv
+if [ "$audiotrack" ]; then
 	audiostream=$(grep -P '(?<=Audio).*[0-9]\.[0-9]' <<< "$scanresults")
 	IFS=$'\n'
 	audiochannels=(${audiostream//\\n/ })
 	audiochannel="${audiochannels[$audiotrack-1]}"
 	IFS=$OIFS
 	if [[ $audiochannel == *"7.1"* ]]; then
-		autoselection+="7"
-		audio_options="--audio $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
-	elif [[ $audiochannel == *"5.1"* ]]; then
-		autoselection+="5"
-		audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
+		a7_options="-map  $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
+#	elif [[ $audiochannel == *"5.1"* ]]; then
+#		autoselection+="5"
+#		audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
 	else
-		autoselection+="2"
-		audio_options="--audio $audiotrack --aencode copy --aname Stereo"
+	## Not sure use case here... only 2ch source...
+		a2_options="-map 0:a copy"
 	fi
 fi
-## Add Subtitles
-if [ "$forcedsubtitletrack" ]; then
-	if [ "$subtitletrack" ]; then
-		autoselection+="SF"
-		subtitles_options="--subtitle $forcedsubtitletrack,$subtitletrack --subtitle-burned" #--subtitle-burned=1 is silent default
-	else
-		autoselection+="F"
-		subtitles_options="--subtitle $forcedsubtitletrack --subtitle-burned"
-	fi
-elif [ "$subtitletrack" ]; then
-	autoselection+="S"
-	subtitles_options="--subtitle $subtitletrack" #expecting a string like "1"
+### Add Subtitles
+if [ "$subtitle" ]; then
+	subtitles_options="-map 0:s:0 -c:s copy"
+else
+	subtitles_options=""
 fi
-if [ "b75s" ]; then
-	autoselection=$b75s
-fi
-## Manual Handbrake Options Override
-if false; then
-	autoselection="O"
-	bitrate="4000"
-	video_options="--encoder x264 --x264-preset veryslow --x264-profile high -q 20 -2 --pfr"
-	# encoder_options="vbv-maxrate=25000:vbv-bufsize=31250:ratetol=inf" #dev
-	audio_options="--audio $audiotrack,$audiotrack --aencoder av_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
-fi
-
-## Encode Video
-time "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
-echo "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile"
-echo "$autoselection"
+### Encode Video
+#time "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
+echo "ffmpeg" -i "$inputfile" $subtitles_options "$outputfile"
 
