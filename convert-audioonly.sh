@@ -92,11 +92,14 @@ if [ ! "$audiotrack" ] && [ ! "$audio7chtrack" ] && [ ! "$audio5chtrack" ] && [ 
 	except "Missing audio track"
 fi
 
+## Video is passthrough
+video_options="-map 0:v -c:v copy"
 ## Determine Audio Channel and apply appropriate audio options
 a7_options=""
 a5_options=""
 a2_options=""
 scanresults=$(HandBrakeCLI --input "$inputfile" --scan 2>&1)
+#ffmpeg -i /mnt/plexmedia/Movies/Family/The\ Grinch\ \(2018\).mkv -map 0:1 -c ac3 -ac 6 -ab 640k ac3.mkv
 #ffmpeg -i /mnt/plexmedia/Movies/Family/The\ Grinch\ \(2018\).mkv -i ac3.mkv \-map 0:0 -map 0:1 -map 1:a -map 0:2 -map 0:3 -c:v copy -c:a:0 copy -c:a copy -c:a:1 copy -c:s copy /mnt/plexmedia/handbrake/The\ Grinch\ \(2018.mkv
 if [ "$audiotrack" ]; then
 	audiostream=$(grep -P '(?<=Audio).*[0-9]\.[0-9]' <<< "$scanresults")
@@ -105,10 +108,9 @@ if [ "$audiotrack" ]; then
 	audiochannel="${audiochannels[$audiotrack-1]}"
 	IFS=$OIFS
 	if [[ $audiochannel == *"7.1"* ]]; then
-		a7_options="-map  $audiotrack,$audiotrack,$audiotrack --aencoder av_aac,ac3,copy --mixdown stereo,5point1 --aname Stereo,\"Surround 5.1\",\"Surround 7.1\""
-#	elif [[ $audiochannel == *"5.1"* ]]; then
-#		autoselection+="5"
-#		audio_options="--audio $audiotrack,$audiotrack --aencoder ca_aac,copy --mixdown stereo --aname Stereo,\"Surround 5.1\""
+		a7_options="-map  0:a:$audiotrack -c:a copy"
+	elif [[ $audiochannel == *"5.1"* ]]; then
+		a5_options="-map 0:a:$audiotrack -c:a copy"
 	else
 	## Not sure use case here... only 2ch source...
 		a2_options="-map 0:a copy"
@@ -116,11 +118,11 @@ if [ "$audiotrack" ]; then
 fi
 ### Add Subtitles
 if [ "$subtitle" ]; then
-	subtitles_options="-map 0:s:0 -c:s copy"
+	subtitles_options="-map 0:s -c:s copy"
 else
 	subtitles_options=""
 fi
 ### Encode Video
 #time "HandBrakeCLI" $video_options --encopts $encoder_options $audio_options $subtitles_options --input "$inputfile" --output "$outputfile" 2>&1
-echo "ffmpeg" -i "$inputfile" $subtitles_options "$outputfile"
+echo "ffmpeg" -i "$inputfile" $video_options $a7_options $a5_options $a2_options $subtitles_options "$outputfile"
 
